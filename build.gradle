@@ -5,14 +5,15 @@ buildscript {
     repositories {
         google()
         jcenter()
-        
+
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:3.6.3'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
-
-        // NOTE: Do not place your application dependencies here; they belong
-        // in the individual module build.gradle files
+        //Gradle Android Maven plugin
+        classpath 'com.github.dcendents:android-maven-gradle-plugin:1.4.1'
+        //Gradle Bintray Plugin
+        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.7.1'
     }
 }
 
@@ -20,7 +21,12 @@ allprojects {
     repositories {
         google()
         jcenter()
-        
+        tasks.withType(Javadoc) {
+            //不对生成的doc文档进行检查        
+            options.addStringOption('Xdoclint:none', '-quiet')
+            //设置编码格式       
+            options.addStringOption('encoding', 'UTF-8')
+        }
     }
 }
 

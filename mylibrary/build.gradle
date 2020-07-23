@@ -1,6 +1,78 @@
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
+apply plugin: 'com.jfrog.bintray'
+apply plugin: 'com.github.dcendents.android-maven'
+
+
+Properties properties = new Properties()
+properties.load(project.rootProject.file('local.properties').newDataInputStream())
+
+def siteUrl = 'https://github.com/xiong5201314/SmartTagLayout'   // 项目的主页
+def gitUrl = 'https://github.com/xiong5201314/SmartTagLayout.git'   // Git仓库的url
+
+version = "1.0"
+group = "com.xiong.mylibrary"
+
+bintray {
+    user = properties.getProperty("bintray.user")
+    key = properties.getProperty("bintray.apikey")
+    pkg {
+        repo = 'SmartTablayout'//自己bintray创建仓库名字
+        name = 'SmartTablayout'//Library的名字
+        websiteUrl = siteUrl
+        vcsUrl = gitUrl
+        licenses = ['Apache-2.0']//不能随便写，只能是仓库创建时选择的license type
+        userOrg = 'sxiong0602' //自己bintray创建的organization名称
+        publish = true // 是否是公开项目。
+
+        version {
+            name = '1.0'
+            desc = '搜索历史记录、流式布局'
+            released  = new Date()
+            vcsTag = 'v1.0'
+            attributes = ['gradle-plugin': 'com.use.less:com.use.less.gradle:gradle-useless-plugin']
+        }
+    }
+    configurations = ['archives']
+}
+
+install {
+    repositories.mavenInstaller {
+        // This generates POM.xml with proper parameters
+        pom {
+            project {
+                packaging 'aar'
+                // Add your description here
+                name 'SmartTagLayout'
+                description '搜索历史记录、流式布局'
+                url siteUrl
+                // Set your license
+                licenses {
+                    license {
+                        name 'Apache-2.0'
+                        url ''
+                    }
+                }
+                developers {
+                    developer {
+                        id 'sxiong0602'        //填写bintray或者github的用户名
+                        name 'sxiong'         //姓名，可以是中文
+                        email 'sxiong0602@gmail.com'
+                    }
+                }
+                scm {
+                    connection gitUrl
+                    developerConnection gitUrl
+                    url siteUrl
+                }
+            }
+        }
+    }
+}
+
+
+
 
 android {
     compileSdkVersion 29
@@ -33,4 +105,21 @@ dependencies {
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test.ext:junit:1.1.1'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
+}
+task sourcesJar(type: Jar) {
+    from android.sourceSets.main.java.srcDirs
+    classifier = 'sources'
+}
+task javadoc(type: Javadoc) {
+    failOnError false //必须添加以免出错
+    source = android.sourceSets.main.java.srcDirs
+    classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
+}
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    classifier = 'javadoc'
+    from javadoc.destinationDir
+}
+artifacts {
+    archives javadocJar
+    archives sourcesJar
 }
